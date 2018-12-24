@@ -1,0 +1,23 @@
+server:
+  port: 8081
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/spring_security?useUnicode=true&characterEncoding=UTF-8
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: 123456
+mybatis:
+  config-location: classpath:/config/mybatis-config.xml
+  mapper-locations: classpath:/mapper/*.xml
+  type-aliases-package: com.victor.security.domain
+swagger:
+  enable: true
+##----JWT相关配置
+jwt:
+  header: Authorization
+  secret: eyJleHAiOjE1NDMyMDUyODUsInN1YiI6ImFkbWluIiwiY3Jl
+  expiration: 3600000
+  route:
+    login: /login
+    register: /register
+    refresh: /refresh
