@@ -2,30 +2,36 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.victor.security.dao.SysRoleMapper">
+
   <resultMap id="BaseResultMap" type="com.victor.security.domain.SysRole">
     <id column="id" property="id" jdbcType="BIGINT"/>
     <result column="role_name" property="roleName" jdbcType="VARCHAR"/>
     <result column="role_chinese_name" property="roleChineseName" jdbcType="VARCHAR"/>
   </resultMap>
+
   <sql id="Base_Column_List">
     id, role_name, role_chinese_name
   </sql>
+
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
     select
     <include refid="Base_Column_List"/>
     from t_sys_role
     where id = #{id,jdbcType=BIGINT}
   </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from t_sys_role
     where id = #{id,jdbcType=BIGINT}
   </delete>
+
   <insert id="insert" parameterType="com.victor.security.domain.SysRole">
     insert into t_sys_role (id, role_name, role_chinese_name
       )
     values (#{id,jdbcType=BIGINT}, #{roleName,jdbcType=VARCHAR}, #{roleChineseName,jdbcType=VARCHAR}
       )
   </insert>
+
   <insert id="insertSelective" parameterType="com.victor.security.domain.SysRole">
     insert into t_sys_role
     <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -51,6 +57,7 @@
       </if>
     </trim>
   </insert>
+
   <update id="updateByPrimaryKeySelective" parameterType="com.victor.security.domain.SysRole">
     update t_sys_role
     <set>
@@ -63,10 +70,23 @@
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
+
   <update id="updateByPrimaryKey" parameterType="com.victor.security.domain.SysRole">
     update t_sys_role
     set role_name = #{roleName,jdbcType=VARCHAR},
       role_chinese_name = #{roleChineseName,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="getRolesByMenu" parameterType="java.lang.String" resultMap="BaseResultMap">
+    SELECT
+    role.id,
+    role.role_name,
+    role.role_chinese_name
+    FROM t_sys_menu menu
+    INNER JOIN t_sys_menu_role mr ON mr.menu_id = menu.id
+    INNER JOIN t_sys_role role ON role.id = mr.role_id
+    WHERE menu.url = #{url}
+  </select>
+
 </mapper>

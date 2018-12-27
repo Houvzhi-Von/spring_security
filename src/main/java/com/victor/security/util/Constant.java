@@ -11,8 +11,6 @@ public class Constant {
 
   public static final String HEAD_IS_NULL = "header为空";
 
-  public static final String TOKEN_HEAD_VALUE = "Bearer ";
-
   public static final String TOKEN_IS_NULL = "token为空";
 
   public static final String USER_NOT_ENABLE = "账号被禁用";
@@ -22,5 +20,7 @@ public class Constant {
   public static final String USER_PASSWORD_ERROR = "密码错误";
 
   public static final String LOGIN_FAIL = "登录信息错误";
+
+  public static final String LOGIN_URL = "/login";
 
 }

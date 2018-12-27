@@ -1,12 +1,13 @@
-package com.victor.security.config;
+package com.victor.security.security;
 
 import com.victor.security.filter.JwtAuthenticationTokenFilter;
-import com.victor.security.handler.CustomAuthenticationFailureHandler;
+import com.victor.security.handler.AuthenticationAccessDeniedHandler;
 import javax.annotation.Resource;
 import org.springframework.context.annotation.*;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
+import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,6 +19,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsUtils;
@@ -43,7 +45,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
   @Resource
-  private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+  private UrlFilterInvocationSecurityMetadataSource urlFilterInvocationSecurityMetadataSource;
+
+  @Resource
+  private UrlAccessDecisionManager urlAccessDecisionManager;
+
+  @Resource
+  private AuthenticationAccessDeniedHandler authenticationAccessDeniedHandler;
 
   private static final String[] AUTH_WHITE_LIST = {
       "/swagger-ui.html",
@@ -89,7 +97,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //        .csrf().disable().sessionManagement()
 //        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 //        .and().headers().cacheControl();
-
+    http.authorizeRequests()
+        .withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
+          @Override
+          public <O extends FilterSecurityInterceptor> O postProcess(O o) {
+            o.setSecurityMetadataSource(urlFilterInvocationSecurityMetadataSource);
+            o.setAccessDecisionManager(urlAccessDecisionManager);
+            return o;
+          }
+        }).and().exceptionHandling().accessDeniedHandler(authenticationAccessDeniedHandler);
     http.csrf().disable().sessionManagement()
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
         .and().authorizeRequests().antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
